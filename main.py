@@ -7,11 +7,17 @@ import os
 
 def download(url: str):
     yt = YouTube(url)
-    print(f'downloading: {yt.title}')
+    title = ''
+    try:
+        title = yt.title
+    except KeyError:
+        title = yt.author
+
+    print(f'downloading: {title}')
     # print(yt.streams.filter(only_audio=True, abr='128kbps'))
 
     yt.streams.filter(only_audio=True, abr='128kbps').first().download(
-        filename=f'{yt.title}.mp3')
+        filename=f'{title}.mp4')
 
 
 if __name__ == "__main__":
@@ -23,7 +29,10 @@ if __name__ == "__main__":
         reader = csv.reader(f)
 
         for row in reader:
-            url_list.append(row[0])
+            if row[0].startswith('//') or row[0].startswith('#'):
+                print(f'skipping url {row[0]}')
+            else:
+                url_list.append(row[0])
 
     try:
         os.chdir('downloads')
